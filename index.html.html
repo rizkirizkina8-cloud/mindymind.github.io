@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Toolkit AI: 6 Fitur Gemini</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Dynamic Utility (Green, Yellow, Blue, Purple, Indigo, Red) -->
+    <!-- Application Structure Plan: The SPA is a simple utility hub. It consists only of a main container holding six distinct, function-specific AI cards. The structure is a responsive grid (3 columns on desktop, 1 on mobile) prioritizing direct access to each tool. There is no navigation as the entire content is focused on the tools themselves. This design choice maximizes usability for immediate interaction with the AI features. -->
+    <!-- Visualization & Content Choices: 
+        1. All 6 tools use card layout with distinct color coding and emojis -> Goal: Distinguish functions quickly -> Viz: Styled HTML/Tailwind cards -> Interaction: Buttons trigger specific Gemini API calls (Text, Grounding, TTS) -> Justification: Provides clear visual hierarchy and instant understanding of each tool's purpose. (HTML/JS/Gemini API)
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+            color: #1e293b; /* slate-800 */
+        }
+        .ai-card {
+            min-height: 480px; 
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-6 py-4 text-center">
+            <h1 class="text-2xl font-bold text-indigo-700">Mental Toolkit AI: 6 Alat Cerdas</h1>
+            <p class="text-sm text-slate-500 mt-1">Dukungan pribadi dan perencanaan strategis yang didukung Gemini API.</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- AI Feature 1: Dukungan Instan Personal (Short-Term) -->
+            <div class="ai-card bg-green-50 p-6 rounded-xl shadow-xl border-2 border-green-200">
+                <div class="text-green-600 mb-3 text-center"><span class="text-4xl">💡</span></div>
+                <h4 class="text-xl font-bold mb-2 text-center text-slate-800">1. Dukungan Instan Personal</h4>
+                <p class="text-slate-600 text-sm mb-4 flex-grow">Jelaskan tantangan yang Anda hadapi saat ini untuk mendapatkan 3-5 kiat praktis segera.</p>
+                <input type="text" id="userInputSupport" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-green-500 focus:border-green-500" placeholder="Contoh: Sangat cemas menghadapi ujian besok"/>
+                <button id="generateSupportBtn" class="w-full mt-4 py-2 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition-colors flex items-center justify-center disabled:bg-green-400 disabled:cursor-not-allowed">
+                    <span id="supportButtonText">Dapatkan Kiat Personal ✨</span>
+                    <svg id="supportLoadingSpinner" class="hidden animate-spin h-5 w-5 text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+                <div id="supportOutput" class="mt-4 p-4 bg-white border border-green-300 rounded-lg text-slate-700 text-sm hidden"></div>
+                <div id="supportErrorOutput" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm hidden"></div>
+            </div>
+
+            <!-- AI Feature 2: Analisis Mood Cepat (Short-Term) -->
+            <div class="ai-card bg-yellow-50 p-6 rounded-xl shadow-xl border-2 border-yellow-200">
+                <div class="text-yellow-600 mb-3 text-center"><span class="text-4xl">😊</span></div>
+                <h4 class="text-xl font-bold mb-2 text-center text-slate-800">2. Analisis Mood Cepat</h4>
+                <p class="text-slate-600 text-sm mb-4 flex-grow">Pilih emoji suasana hati Anda saat ini. AI akan memberikan refleksi empatik dan saran instan.</p>
+                <select id="selectMood" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    <option value="">-- Pilih Mood --</option>
+                    <option value="Senang dan Bersemangat">😄 Senang & Bersemangat</option>
+                    <option value="Cemas dan Gelisah">😟 Cemas & Gelisah</option>
+                    <option value="Lelah dan Kelelahan">😩 Lelah & Kelelahan</option>
+                    <option value="Marah dan Frustasi">😡 Marah & Frustasi</option>
+                    <option value="Biasa saja, netral">😐 Biasa saja, Netral</option>
+                </select>
+                <button id="generateMoodBtn" class="w-full mt-4 py-2 px-4 bg-yellow-600 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-700 transition-colors flex items-center justify-center disabled:bg-yellow-400 disabled:cursor-not-allowed">
+                    <span id="moodButtonText">Dapatkan Refleksi ☀️</span>
+                    <svg id="moodLoadingSpinner" class="hidden animate-spin h-5 w-5 text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+                <div id="moodOutput" class="mt-4 p-4 bg-white border border-yellow-300 rounded-lg text-slate-700 text-sm hidden"></div>
+                <div id="moodErrorOutput" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm hidden"></div>
+            </div>
+
+            <!-- AI Feature 3: NEW: Analisis Perspektif & Reframing (Mid-Term) -->
+            <div class="ai-card bg-blue-50 p-6 rounded-xl shadow-xl border-2 border-blue-200">
+                <div class="text-blue-600 mb-3 text-center"><span class="text-4xl">🔄</span></div>
+                <h4 class="text-xl font-bold mb-2 text-center text-slate-800">3. Analisis Perspektif & Reframing</h4>
+                <p class="text-slate-600 text-sm mb-4 flex-grow">Masukkan pikiran negatif spesifik Anda. AI akan memberikan 3 perspektif alternatif yang lebih seimbang (Teknik CBT).</p>
+                <input type="text" id="userInputReframing" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Saya pasti gagal dalam proyek ini"/>
+                <button id="generateReframingBtn" class="w-full mt-4 py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors flex items-center justify-center disabled:bg-blue-400 disabled:cursor-not-allowed">
+                    <span id="reframingButtonText">Reframing Pikiran 🧠</span>
+                    <svg id="reframingLoadingSpinner" class="hidden animate-spin h-5 w-5 text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+                <div id="reframingOutput" class="mt-4 p-4 bg-white border border-blue-300 rounded-lg text-slate-700 text-sm hidden"></div>
+                <div id="reframingErrorOutput" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm hidden"></div>
+            </div>
+            
+            <!-- AI Feature 4: Pembuat Slogan Kampanye & Suara (Short-Term TTS) -->
+            <div class="ai-card bg-purple-50 p-6 rounded-xl shadow-xl border-2 border-purple-200">
+                <div class="text-purple-600 mb-3 text-center"><span class="text-4xl">📣</span></div>
+                <h4 class="text-xl font-bold mb-2 text-center text-slate-800">4. Pembuat Slogan & Suara</h4>
+                <p class="text-slate-600 text-sm mb-4 flex-grow">Buat slogan kesadaran singkat dan dengarkan dalam suara AI (TTS) untuk kampanye cepat.</p>
+                <input type="text" id="userInputSlogan" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500" placeholder="Contoh: Anti-stigma"/>
+                <button id="generateSloganBtn" class="w-full mt-4 py-2 px-4 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition-colors flex items-center justify-center disabled:bg-purple-400 disabled:cursor-not-allowed">
+                    <span id="sloganButtonText">Buat Slogan & Putar 🔊</span>
+                    <svg id="sloganLoadingSpinner" class="hidden animate-spin h-5 w-5 text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+                <div id="sloganOutput" class="mt-4 p-4 bg-white border border-purple-300 rounded-lg text-slate-700 text-sm hidden">
+                    <p id="sloganTextOutput" class="font-bold mb-2 text-center text-slate-800"></p>
+                    <audio id="sloganAudioPlayer" controls class="w-full"></audio>
+                </div>
+                <div id="sloganErrorOutput" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm hidden"></div>
+            </div>
+
+            <!-- AI Feature 5: Analisis Tren Global (Long-Term Grounded Search) -->
+            <div class="ai-card bg-indigo-50 p-6 rounded-xl shadow-xl border-2 border-indigo-200">
+                <div class="text-indigo-600 mb-3 text-center"><span class="text-4xl">🌍</span></div>
+                <h4 class="text-xl font-bold mb-2 text-center text-slate-800">5. Analisis Tren Global (Riset)</h4>
+                <p class="text-slate-600 text-sm mb-4 flex-grow">Cari riset dan data terkini yang diverifikasi dari web mengenai terapi baru atau tren sosial (*Grounded Search*).</p>
+                <input type="text" id="userInputTrend" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: Efektivitas terapi seni untuk depresi"/>
+                <button id="generateTrendBtn" class="w-full mt-4 py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center disabled:bg-indigo-400 disabled:cursor-not-allowed">
+                    <span id="trendButtonText">Cari Tren Terkini 🔎</span>
+                    <svg id="trendLoadingSpinner" class="hidden animate-spin h-5 w-5 text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+                <div id="trendOutput" class="mt-4 p-4 bg-white border border-indigo-300 rounded-lg text-slate-700 text-sm hidden"></div>
+                <div id="trendErrorOutput" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm hidden"></div>
+            </div>
+
+            <!-- AI Feature 6: Pembuat Modul Edukasi Mandiri (Long-Term) -->
+            <div class="ai-card bg-red-50 p-6 rounded-xl shadow-xl border-2 border-red-200">
+                <div class="text-red-600 mb-3 text-center"><span class="text-4xl">📚</span></div>
+                <h4 class="text-xl font-bold mb-2 text-center text-slate-800">6. Modul Edukasi Mandiri (7 Hari)</h4>
+                <p class="text-slate-600 text-sm mb-4 flex-grow">Buat kerangka modul belajar mandiri 7 hari tentang topik *skill* mental tertentu.</p>
+                <input type="text" id="userInputModule" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-red-500 focus:border-red-500" placeholder="Contoh: Teknik Resilience untuk Gen Z"/>
+                <button id="generateModuleBtn" class="w-full mt-4 py-2 px-4 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors flex items-center justify-center disabled:bg-red-400 disabled:cursor-not-allowed">
+                    <span id="moduleButtonText">Buat Modul 7 Hari 📖</span>
+                    <svg id="moduleLoadingSpinner" class="hidden animate-spin h-5 w-5 text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+                <div id="moduleOutput" class="mt-4 p-4 bg-white border border-red-300 rounded-lg text-slate-700 text-sm hidden"></div>
+                <div id="moduleErrorOutput" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm hidden"></div>
+            </div>
+
+        </div>
+    </main>
+    
+    <footer class="bg-slate-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>Mental Toolkit AI | Solusi Jangka Pendek, Menengah, dan Panjang.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- API CONFIG & UTILITIES ---
+        const apiKey = "AIzaSyDJJBvrcCWF8azHhvKhAVepoIeJEX5LOYA"; // GANTI DENGAN KUNCI API ANDA
+        const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+        // Base64 to ArrayBuffer helper for TTS
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        // PCM to WAV conversion for TTS
+        function pcmToWav(pcm16, sampleRate) {
+            const numChannels = 1;
+            const bitsPerSample = 16;
+            const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+            const blockAlign = numChannels * (bitsPerSample / 8);
+            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
+            const view = new DataView(buffer);
+            
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+            
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcm16.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitsPerSample, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcm16.length * 2, true);
+            
+            let offset = 44;
+            for (let i = 0; i < pcm16.length; i++) {
+                view.setInt16(offset, pcm16[i], true);
+                offset += 2;
+            }
+            
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+        
+        // General Text API Call with Exponential Backoff and Grounding
+        async function callGeminiTextAPI(payload, useGrounding = false, maxRetries = 3, delay = 1000) {
+            if (useGrounding) {
+                if (!payload.tools) payload.tools = [];
+                payload.tools.push({ "google_search": {} });
+            }
+
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(textApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 && i < maxRetries - 1) { 
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                            continue;
+                        }
+                        throw new Error(`Permintaan API gagal. Status HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        let sources = [];
+                        const groundingMetadata = candidate.groundingMetadata;
+                        if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                            sources = groundingMetadata.groundingAttributions
+                                .map(attribution => ({
+                                    uri: attribution.web?.uri,
+                                    title: attribution.web?.title,
+                                }))
+                                .filter(source => source.uri && source.title); 
+                        }
+                        return { text: candidate.content.parts[0].text, sources };
+                    } else {
+                        throw new Error("Struktur respons dari API tidak valid.");
+                    }
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                        throw new Error(`Gagal mengambil saran setelah ${maxRetries} percobaan. Error: ${error.message}`);
+                    }
+                }
+            }
+        }
+        
+        // TTS API Call
+        async function callGeminiTTSAPI(textToSpeak, maxRetries = 3, delay = 1000) {
+            const ttsPayload = {
+                contents: [{
+                    parts: [{ text: textToSpeak }]
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: "Puck" } 
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(ttsApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(ttsPayload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 && i < maxRetries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                            continue;
+                        }
+                        throw new Error(`TTS API failed with status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const part = result?.candidates?.[0]?.content?.parts?.[0];
+                    const audioData = part?.inlineData?.data;
+                    const mimeType = part?.inlineData?.mimeType;
+
+                    if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                        const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                        const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 16000; 
+                        const pcmData = base64ToArrayBuffer(audioData);
+                        const pcm16 = new Int16Array(pcmData);
+                        const wavBlob = pcmToWav(pcm16, sampleRate);
+                        return URL.createObjectURL(wavBlob);
+                    } else {
+                        throw new Error("TTS response does not contain valid audio data.");
+                    }
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                        throw new Error(`Gagal mendapatkan audio TTS setelah ${maxRetries} percobaan. Error: ${error.message}`);
+                    }
+                }
+            }
+        }
+        
+        // --- LLM Feature 3: Analisis Perspektif & Reframing ---
+        // (Removed complex structured JSON call)
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // --- LLM Feature 1: Dukungan Instan Personal ---
+            const generateSupportBtn = document.getElementById('generateSupportBtn');
+            const userInputSupport = document.getElementById('userInputSupport');
+            const supportOutput = document.getElementById('supportOutput');
+            const supportErrorOutput = document.getElementById('supportErrorOutput');
+            const supportLoadingSpinner = document.getElementById('supportLoadingSpinner');
+            const supportButtonText = document.getElementById('supportButtonText');
+
+            generateSupportBtn.addEventListener('click', async () => {
+                const query = userInputSupport.value.trim();
+                if (query.length < 10) {
+                    supportErrorOutput.innerText = "Mohon jelaskan situasi Anda (minimal 10 karakter).";
+                    supportErrorOutput.classList.remove('hidden');
+                    supportOutput.classList.add('hidden');
+                    return;
+                }
+
+                supportErrorOutput.classList.add('hidden');
+                supportOutput.classList.add('hidden');
+                generateSupportBtn.disabled = true;
+                supportLoadingSpinner.classList.remove('hidden');
+                supportButtonText.innerText = "Menganalisis...";
+
+                try {
+                    const systemPrompt = "Anda adalah konselor yang empatik dan suportif. Berikan 3-5 kiat praktis dan segera (solusi jangka pendek) dalam bentuk poin-poin yang dapat dilakukan pengguna sekarang untuk mengatasi tantangan emosional yang mereka jelaskan. Pertahankan nada yang hangat dan non-judgmental.";
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: `Tantangan emosional: ${query}` }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                    };
+
+                    const result = await callGeminiTextAPI(payload, false);
+                    supportOutput.innerHTML = `<h5 class="font-bold mb-2">Respons AI:</h5>` + result.text.replace(/\n/g, '<br>');
+                    supportOutput.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Gemini API Error (Support):", error);
+                    supportErrorOutput.innerText = `Gagal mendapatkan saran. Kesalahan teknis: ${error.message}. Mohon cek konsol browser (F12) untuk detail status HTTP.`;
+                    supportErrorOutput.classList.remove('hidden');
+                } finally {
+                    generateSupportBtn.disabled = false;
+                    supportLoadingSpinner.classList.add('hidden');
+                    supportButtonText.innerText = "Dapatkan Kiat Personal ✨";
+                }
+            });
+
+            // --- LLM Feature 2: Analisis Mood Cepat ---
+            const generateMoodBtn = document.getElementById('generateMoodBtn');
+            const selectMood = document.getElementById('selectMood');
+            const moodOutput = document.getElementById('moodOutput');
+            const moodErrorOutput = document.getElementById('moodErrorOutput');
+            const moodLoadingSpinner = document.getElementById('moodLoadingSpinner');
+            const moodButtonText = document.getElementById('moodButtonText');
+
+            generateMoodBtn.addEventListener('click', async () => {
+                const query = selectMood.value;
+                if (!query) {
+                    moodErrorOutput.innerText = "Mohon pilih salah satu mood dari daftar.";
+                    moodErrorOutput.classList.remove('hidden');
+                    moodOutput.classList.add('hidden');
+                    return;
+                }
+
+                moodErrorOutput.classList.add('hidden');
+                moodOutput.classList.add('hidden');
+                generateMoodBtn.disabled = true;
+                moodLoadingSpinner.classList.remove('hidden');
+                moodButtonText.innerText = "Menganalisis Mood...";
+
+                try {
+                    const systemPrompt = "Anda adalah jurnal refleksi yang empatik. Berikan satu paragraf refleksi yang memvalidasi perasaan ini dan berikan satu saran praktis dan lembut untuk langkah berikutnya.";
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: `Mood pengguna saat ini: ${query}. Berikan refleksi dan saran.` }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                    };
+
+                    const result = await callGeminiTextAPI(payload, false);
+                    moodOutput.innerHTML = `<h5 class="font-bold mb-2">Refleksi Mood:</h5>` + result.text.replace(/\n/g, '<br>');
+                    moodOutput.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Gemini API Error (Mood):", error);
+                    moodErrorOutput.innerText = `Gagal mendapatkan refleksi. Kesalahan teknis: ${error.message}. Mohon cek konsol browser (F12) untuk detail status HTTP.`;
+                    moodErrorOutput.classList.remove('hidden');
+                } finally {
+                    generateMoodBtn.disabled = false;
+                    moodLoadingSpinner.classList.add('hidden');
+                    moodButtonText.innerText = "Dapatkan Refleksi ☀️";
+                }
+            });
+            
+            // --- LLM Feature 3: Analisis Perspektif & Reframing (NEW FEATURE) ---
+            const generateReframingBtn = document.getElementById('generateReframingBtn');
+            const userInputReframing = document.getElementById('userInputReframing');
+            const reframingOutput = document.getElementById('reframingOutput');
+            const reframingErrorOutput = document.getElementById('reframingErrorOutput');
+            const reframingLoadingSpinner = document.getElementById('reframingLoadingSpinner');
+            const reframingButtonText = document.getElementById('reframingButtonText');
+            
+            generateReframingBtn.addEventListener('click', async () => {
+                const query = userInputReframing.value.trim();
+                
+                if (query.length < 10) {
+                    reframingErrorOutput.innerText = "Mohon jelaskan pikiran spesifik Anda (minimal 10 karakter).";
+                    reframingErrorOutput.classList.remove('hidden');
+                    reframingOutput.classList.add('hidden');
+                    return;
+                }
+
+                reframingErrorOutput.classList.add('hidden');
+                reframingOutput.classList.add('hidden');
+                generateReframingBtn.disabled = true;
+                reframingLoadingSpinner.classList.remove('hidden');
+                reframingButtonText.innerText = "Menganalisis Pikiran...";
+
+                try {
+                    const systemPrompt = "Anda adalah terapis kognitif yang mendukung. Tugas Anda adalah membantu pengguna mereframing pikiran negatif mereka. Berikan 3 poin perspektif alternatif yang realistis, berfokus pada fakta, bukan emosi, dan berikan tips singkat untuk aksi selanjutnya. Gunakan format poin-poin.";
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: `Pikiran negatif untuk direframe: ${query}` }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                    };
+
+                    const result = await callGeminiTextAPI(payload, false);
+                    reframingOutput.innerHTML = `<h5 class="font-bold mb-2 text-blue-800">3 Perspektif Alternatif:</h5>` + result.text.replace(/\n/g, '<br>');
+                    reframingOutput.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("Gemini API Error (Reframing):", error);
+                    reframingErrorOutput.innerText = `Gagal mereframing. Kesalahan teknis: ${error.message}. Mohon cek konsol browser (F12) untuk detail status HTTP.`;
+                    reframingErrorOutput.classList.remove('hidden');
+                } finally {
+                    generateReframingBtn.disabled = false;
+                    reframingLoadingSpinner.classList.add('hidden');
+                    reframingButtonText.innerText = "Reframing Pikiran 🧠";
+                }
+            });
+            
+            // --- LLM Feature 4: Pembuat Slogan Kampanye & Suara (TTS) ---
+            const generateSloganBtn = document.getElementById('generateSloganBtn');
+            const userInputSlogan = document.getElementById('userInputSlogan');
+            const sloganOutput = document.getElementById('sloganOutput');
+            const sloganErrorOutput = document.getElementById('sloganErrorOutput');
+            const sloganLoadingSpinner = document.getElementById('sloganLoadingSpinner');
+            const sloganButtonText = document.getElementById('sloganButtonText');
+            const sloganAudioPlayer = document.getElementById('sloganAudioPlayer');
+            const sloganTextOutput = document.getElementById('sloganTextOutput');
+
+            generateSloganBtn.addEventListener('click', async () => {
+                const query = userInputSlogan.value.trim();
+                if (query.length < 5) {
+                    sloganErrorOutput.innerText = "Mohon masukkan topik slogan (minimal 5 karakter).";
+                    sloganErrorOutput.classList.remove('hidden');
+                    sloganOutput.classList.add('hidden');
+                    return;
+                }
+
+                sloganErrorOutput.classList.add('hidden');
+                sloganOutput.classList.add('hidden');
+                sloganAudioPlayer.src = '';
+                
+                generateSloganBtn.disabled = true;
+                sloganLoadingSpinner.classList.remove('hidden');
+                sloganButtonText.innerText = "Membuat Teks Slogan...";
+
+                try {
+                    // Step 1: Generate Slogan Text
+                    const systemPromptText = "Anda adalah ahli kampanye kesadaran. Buat 1 slogan pendek, inspiratif, dan kuat untuk kampanye kesehatan mental dengan topik yang diberikan. Berikan respons hanya berupa satu kalimat slogan.";
+                    const payloadText = {
+                        contents: [{ parts: [{ text: `Buat slogan kampanye tentang: ${query}` }] }],
+                        systemInstruction: { parts: [{ text: systemPromptText }] },
+                    };
+                    const resultText = await callGeminiTextAPI(payloadText, false);
+                    const sloganText = resultText.text.trim().replace(/"/g, ''); 
+                    sloganTextOutput.innerText = sloganText;
+                    
+                    sloganButtonText.innerText = "Mengonversi ke Suara...";
+
+                    // Step 2: Generate TTS Audio
+                    const audioUrl = await callGeminiTTSAPI(sloganText);
+                    
+                    sloganAudioPlayer.src = audioUrl;
+                    sloganOutput.classList.remove('hidden');
+                    sloganAudioPlayer.play();
+
+                } catch (error) {
+                    console.error("Gemini API Error (Slogan/TTS):", error);
+                    sloganErrorOutput.innerText = `Gagal membuat atau memutar slogan. Kesalahan teknis: ${error.message}. Mohon cek konsol browser (F12) untuk detail status HTTP.`;
+                    sloganErrorOutput.classList.remove('hidden');
+                } finally {
+                    generateSloganBtn.disabled = false;
+                    sloganLoadingSpinner.classList.add('hidden');
+                    sloganButtonText.innerText = "Buat Slogan & Putar 🔊";
+                }
+            });
+
+            // --- LLM Feature 5: Analisis Tren Global (Grounded Search) ---
+            const generateTrendBtn = document.getElementById('generateTrendBtn');
+            const userInputTrend = document.getElementById('userInputTrend');
+            const trendOutput = document.getElementById('trendOutput');
+            const trendErrorOutput = document.getElementById('trendErrorOutput');
+            const trendLoadingSpinner = document.getElementById('trendLoadingSpinner');
+            const trendButtonText = document.getElementById('trendButtonText');
+
+            generateTrendBtn.addEventListener('click', async () => {
+                const query = userInputTrend.value.trim();
+                
+                if (query.length < 10) {
+                    trendErrorOutput.innerText = "Mohon masukkan topik riset yang valid (minimal 10 karakter).";
+                    trendErrorOutput.classList.remove('hidden');
+                    trendOutput.classList.add('hidden');
+                    return;
+                }
+
+                trendErrorOutput.classList.add('hidden');
+                trendOutput.classList.add('hidden');
+                
+                generateTrendBtn.disabled = true;
+                trendLoadingSpinner.classList.remove('hidden');
+                trendButtonText.innerText = "Mencari Data Global...";
+
+                try {
+                    const systemPrompt = "Anda adalah analis riset kesehatan mental. Cari tren global terbaru, studi kasus, atau temuan ilmiah tentang topik yang diberikan. Berikan ringkasan 3-5 poin temuan paling relevan dan sertakan sumber referensi yang digunakan di akhir respons.";
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: `Cari tren global terkini tentang: ${query}` }] }],
+                        systemInstruction: {
+                            parts: [{ text: systemPrompt }]
+                        },
+                    };
+
+                    const result = await callGeminiTextAPI(payload, true); 
+
+                    let finalOutput = result.text;
+                    
+                    if (result.sources && result.sources.length > 0) {
+                        const sourcesHtml = result.sources.map((source, index) => 
+                            `<li><a href="${source.uri}" target="_blank" class="text-blue-600 hover:underline">${source.title || 'Sumber'}</a></li>`
+                        ).join('');
+                        finalOutput += `<h5 class="font-bold mt-4 mb-2">Sumber Riset:</h5><ul class="list-disc ml-4 text-xs space-y-1">${sourcesHtml}</ul>`;
+                    } else if (!finalOutput) {
+                        finalOutput = "AI tidak dapat menemukan informasi terkini yang terverifikasi mengenai topik riset tersebut.";
+                    }
+                    
+                    trendOutput.innerHTML = finalOutput.replace(/\n/g, '<br>');
+                    trendOutput.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("Gemini API Error (Trend Search):", error);
+                    trendErrorOutput.innerText = `Gagal mencari tren. Kesalahan teknis: ${error.message}. Mohon cek konsol browser (F12) untuk detail status HTTP.`;
+                    trendErrorOutput.classList.remove('hidden');
+                } finally {
+                    generateTrendBtn.disabled = false;
+                    trendLoadingSpinner.classList.add('hidden');
+                    trendButtonText.innerText = "Cari Tren Terkini 🔎";
+                }
+            });
+            
+            // --- LLM Feature 6: Pembuat Modul Edukasi Mandiri (Module Generation) ---
+            const generateModuleBtn = document.getElementById('generateModuleBtn');
+            const userInputModule = document.getElementById('userInputModule');
+            const moduleOutput = document.getElementById('moduleOutput');
+            const moduleErrorOutput = document.getElementById('moduleErrorOutput');
+            const moduleLoadingSpinner = document.getElementById('moduleLoadingSpinner');
+            const moduleButtonText = document.getElementById('moduleButtonText');
+
+            generateModuleBtn.addEventListener('click', async () => {
+                const query = userInputModule.value.trim();
+                
+                if (query.length < 10) {
+                    moduleErrorOutput.innerText = "Mohon masukkan topik modul yang valid (minimal 10 karakter).";
+                    moduleErrorOutput.classList.remove('hidden');
+                    moduleOutput.classList.add('hidden');
+                    return;
+                }
+
+                moduleErrorOutput.classList.add('hidden');
+                moduleOutput.classList.add('hidden');
+                
+                generateModuleBtn.disabled = true;
+                moduleLoadingSpinner.classList.remove('hidden');
+                moduleButtonText.innerText = "Membuat Modul...";
+
+                try {
+                    const systemPrompt = "Anda adalah perancang kurikulum kesehatan mental. Buat kerangka modul belajar mandiri 7 hari yang komprehensif untuk topik yang diberikan. Setiap hari harus memiliki satu fokus topik, satu tugas refleksi, dan satu aksi nyata (praktik). Format output dalam poin-poin terstruktur.";
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: `Buat modul 7 hari untuk topik: ${query}` }] }],
+                        systemInstruction: {
+                            parts: [{ text: systemPrompt }]
+                        },
+                    };
+
+                    const result = await callGeminiTextAPI(payload, false);
+                    
+                    moduleOutput.innerHTML = `<h5 class="font-bold mb-2">Kerangka Modul 7 Hari:</h5>` + result.text.replace(/\n/g, '<br>');
+                    moduleOutput.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("Gemini API Error (Module):", error);
+                    moduleErrorOutput.innerText = `Gagal membuat modul. Kesalahan teknis: ${error.message}. Mohon cek konsol browser (F12) untuk detail status HTTP.`;
+                    moduleErrorOutput.classList.remove('hidden');
+                } finally {
+                    generateModuleBtn.disabled = false;
+                    moduleLoadingSpinner.classList.add('hidden');
+                    moduleButtonText.innerText = "Buat Modul 7 Hari 📖";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
